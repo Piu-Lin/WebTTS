@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "larksr_websdk": "^3.2.405",
     "vue": "^3.4.21"
   },
   "devDependencies": {
