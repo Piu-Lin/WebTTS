@@ -7,7 +7,7 @@ const isRecognizing = ref(false)
 let uemeg = reactive({})
 
 let iatWS
-const recorder = new RecorderManager('/dist')
+const recorder = new RecorderManager('/recordManager')
 let resultText = ref('')
 let resultTextTemp = ref('')
 let status = ref('UNDEFINED')
