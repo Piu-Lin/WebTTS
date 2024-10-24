@@ -1,6 +1,6 @@
 <script setup>
 import Connectpxy from './components/connectpxy.vue'
-import { ref, reactive } from 'vue'
+import { ref, reactive ,onMounted,onBeforeUnmount} from 'vue'
 import sendAssignMessage from '/src/tools/sendAssignMessage.js'
 
 const isRecognizing = ref(false)
@@ -11,7 +11,8 @@ const recorder = new RecorderManager('/recordManager')
 let resultText = ref('')
 let resultTextTemp = ref('')
 let status = ref('UNDEFINED')
-
+const serverMessage = ref('');  // 用来存储来自服务器的消息
+let websocket = null;  // WebSocket 实例
 /**
  * 获取websocket url
  * 该接口需要后端提供，这里为了方便前端处理
@@ -171,12 +172,76 @@ const trigger = (meg) => {
     stopRecognition()
   }
 }
+
+const handleMouseDown = () => {
+  console.log('按钮被按下');
+  sendMessage('按钮被按下');
+  // 你可以在这里执行其他逻辑
+  startRecognition()
+};
+
+const handleMouseUp = () => {
+  console.log('按钮被松开');
+  // 你可以在这里执行其他逻辑
+  sendMessage('按钮被松开');
+  stopRecognition()
+};
+
+
+const sendMessage = (message) => {
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(message);
+  }
+};
+
+const initWebSocket = () => {
+  websocket = new WebSocket('ws://localhost:8080');  // 连接到本地8080端口
+
+  // 监听连接打开事件
+  websocket.onopen = () => {
+    console.log('WebSocket 连接已打开');
+    sendMessage('客户端已连接');
+  };
+
+  // 监听消息事件
+  websocket.onmessage = (event) => {
+    console.log('收到服务器消息:', event.data);
+    serverMessage.value = event.data;  // 更新 UI 显示服务器消息
+  };
+
+  // 监听连接关闭事件
+  websocket.onclose = () => {
+    console.log('WebSocket 连接已关闭');
+  };
+
+  // 监听错误事件
+  websocket.onerror = (error) => {
+    console.error('WebSocket 发生错误:', error);
+  };
+};
+
+onMounted(() => {
+  initWebSocket();
+});
+
+// 组件卸载前关闭 WebSocket
+onBeforeUnmount(() => {
+  if (websocket) {
+    websocket.close();
+  }
+});
 </script>
 
 <template>
   <div id="container"></div>
-  <Connectpxy @trigger="trigger" />
+  <!-- <Connectpxy @trigger="trigger" /> -->
   <div>转换后的文字为 {{ transcript }}</div>
+  <div
+    @mousedown="handleMouseDown"
+    @mouseup="handleMouseUp"
+    @mouseleave="handleMouseUp"  class="button">
+    按住我
+  </div>
 </template>
 
 <style scoped></style>
