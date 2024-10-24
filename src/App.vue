@@ -71,7 +71,8 @@ function renderResult(resultData) {
   if (jsonData.code === 0 && jsonData.data.status === 2) {
     iatWS.close()
     let assignBe='{"eventname":"Voice_Result","text":"'
-    sendAssignMessage(assignBe+resultText.value+'"}')
+    sendMessage(assignBe+resultText.value+'"}');
+    // sendAssignMessage(assignBe+resultText.value+'"}')
   }
   if (jsonData.code !== 0) {
     iatWS.close()
@@ -149,7 +150,6 @@ recorder.onFrameRecorded = ({ isLastFrame, frameBuffer }) => {
 
 const startRecognition = () => {
   console.log('开始录音')
-
   isRecognizing.value = true
   resultText.value = ''
   connectWebSocket()
@@ -175,7 +175,6 @@ const trigger = (meg) => {
 
 const handleMouseDown = () => {
   console.log('按钮被按下');
-  sendMessage('按钮被按下');
   // 你可以在这里执行其他逻辑
   startRecognition()
 };
@@ -183,7 +182,7 @@ const handleMouseDown = () => {
 const handleMouseUp = () => {
   console.log('按钮被松开');
   // 你可以在这里执行其他逻辑
-  sendMessage('按钮被松开');
+  
   stopRecognition()
 };
 
@@ -222,6 +221,9 @@ const initWebSocket = () => {
 
 onMounted(() => {
   initWebSocket();
+  setTimeout(()=>{
+    sendMessage('{"eventname":"EventWakeUp"}');
+  },1000)
 });
 
 // 组件卸载前关闭 WebSocket
