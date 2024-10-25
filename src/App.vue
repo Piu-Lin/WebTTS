@@ -71,6 +71,7 @@ function renderResult(resultData) {
   if (jsonData.code === 0 && jsonData.data.status === 2) {
     iatWS.close()
     let assignBe='{"eventname":"Voice_Result","text":"'
+    console.log("收到语音为："+resultText.value)
     sendMessage(assignBe+resultText.value+'"}');
     // sendAssignMessage(assignBe+resultText.value+'"}')
   }
@@ -194,7 +195,7 @@ const sendMessage = (message) => {
 };
 
 const initWebSocket = () => {
-  websocket = new WebSocket('ws://localhost:8080');  // 连接到本地8080端口
+  websocket = new WebSocket('ws://10.100.12.122:7640');  // 连接到本地8080端口
 
   // 监听连接打开事件
   websocket.onopen = () => {
